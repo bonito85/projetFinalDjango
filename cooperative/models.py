@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 import random
 import string
 from django.utils.timezone import now
+from django.contrib.auth.models import AbstractUser
 
 
 #Ajout de la classe Cooperative
@@ -42,7 +43,6 @@ class Administrateur(AbstractUser):
         return self.role == 'admin'
 
 """
-    
 
 
 class Membre(models.Model):
@@ -50,11 +50,7 @@ class Membre(models.Model):
         ('M', 'Masculin'),
         ('F', 'Féminin'),
     ]
-    STATUS_CHOICES = [
-        ('en attente', 'En attente'),
-        ('actif', 'Membre Actif'),
-        ('inactif', 'Membre Inactif'),
-    ]
+    
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True) 
     nom = models.CharField(max_length=255, null=True, blank=True)
     prenom = models.CharField(max_length=150, null=True, blank=True)
@@ -64,7 +60,6 @@ class Membre(models.Model):
     adresse = models.CharField(max_length=255)
     numero_identification = models.CharField(max_length=6, unique=True)  # Exemple : "ABC123"
     # Ajout du statut choices de l'utilisateur
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='en attente')
     date_inscription = models.DateField(auto_now_add=True)
     # Ajout d'un champ de téléphone
     #numero_telephone = models.CharField(max_length=15, verbose_name="Téléphone", blank=True, null=True)
@@ -89,3 +84,56 @@ class Membre(models.Model):
     
     class Meta:
         ordering = ['-date_inscription']
+
+
+"""
+
+class Membre(AbstractUser):
+    SEXE_CHOICES = [
+        ('M', 'Masculin'),
+        ('F', 'Féminin'),
+    ]
+
+    # Champs hérités d'AbstractUser (à personnaliser)
+    nom = models.CharField("prénom", max_length=150, null=True, blank=True)
+    prenom = models.CharField("nom", max_length=255, null=True, blank=True)
+    email_adresse = models.EmailField("email", blank=True, null=True)
+
+    # Nouveaux champs spécifiques
+    sexe = models.CharField(max_length=1, choices=SEXE_CHOICES, default="M")
+    date_naissance = models.DateField(null=True, blank=True)
+    cooperative = models.ForeignKey('Cooperative', related_name='membres', on_delete=models.CASCADE, null=True)
+    adresse = models.CharField(max_length=255)
+    numero_identification = models.CharField(max_length=6, unique=True)
+    date_inscription = models.DateField(auto_now_add=True)
+
+    # Désactiver les champs inutiles d'AbstractUser
+    username = models.CharField(
+        max_length=150,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Non requis"
+    )
+
+    def save(self, *args, **kwargs):
+        if not self.numero_identification:
+            self.numero_identification = self.generate_identification()
+        super().save(*args, **kwargs)
+
+    def generate_identification(self):
+        lettres = ''.join(random.choices(string.ascii_uppercase, k=3))
+        chiffres = ''.join(random.choices(string.digits, k=3))
+        return f"{lettres}{chiffres}"
+
+    class Meta(AbstractUser.Meta):
+        ordering = ['-date_inscription']
+        verbose_name = "Membre"
+        verbose_name_plural = "Membres"
+
+    def __str__(self):
+        return f"{self.last_name}"
+
+
+
+"""

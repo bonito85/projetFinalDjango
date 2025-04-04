@@ -9,6 +9,11 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
+# Afficher les informations d'un membre dans la page de confirmation d'inscription
+def confirmation_inscription(request, membre_id):
+    membre = get_object_or_404(Membre, pk=membre_id)
+    return render(request, 'Incription/confirmation_inscription.html', {'membre': membre})
+
 
 def index(request): 
     template = loader.get_template('pages/index.html')

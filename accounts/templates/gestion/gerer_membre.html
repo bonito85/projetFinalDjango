@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Gérer les membres{% endblock %}
+{% block content %}
+
+<!-- Ajouter cette section dans le contenu principal -->
+<div class="card shadow-sm mb-5">
+    <div class="card-header bg-warning">
+        <h5 class="mb-0"><i class="fas fa-bell me-2"></i>Demandes en attente</h5>
+    </div>
+    <div class="card-body">
+        {% if demandes_attente %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nom</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Coopérative</th>
+                        <th>Date demande</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for demande in demandes_attente %}
+                    <tr>
+                        <td>{{ demande.nom }}</td>
+                        <td>{{ demande.prenom }}</td>
+                        <td>{{ demande.email }}</td>
+                        <td>{{ demande.cooperative.nom }}</td>
+                        <td>{{ demande.date_inscription|date:"d/m/Y H:i" }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#validerModal{{ demande.id }}">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#rejeterModal{{ demande.id }}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal de validation -->
+                    <div class="modal fade" id="validerModal{{ demande.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title">Valider l'adhésion</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="#">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <p>Confirmer la validation de {{ demande.prenom }} {{ demande.nom }} ?</p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Coopérative :</label>
+                                            <select name="cooperative" class="form-select" required>
+                                                {% for coop in cooperatives %}
+                                                <option value="{{ coop.id }}" 
+                                                    {% if coop.id == demande.cooperative.id %}selected{% endif %}>
+                                                    {{ coop.nom }}
+                                                </option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-success">Confirmer</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal de rejet -->
+                    <div class="modal fade" id="rejeterModal{{ demande.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-danger text-white">
+                                    <h5 class="modal-title">Rejeter la demande</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <form method="POST" action="#">
+                                    {% csrf_token %}
+                                    <div class="modal-body">
+                                        <p>Confirmer le rejet de la demande de {{ demande.prenom }} {{ demande.nom }} ?</p>
+                                        <div class="mb-3">
+                                            <label class="form-label">Raison du rejet :</label>
+                                            <textarea name="raison" class="form-control" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <button type="submit" class="btn btn-danger">Confirmer</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">
+            <i class="fas fa-info-circle me-2"></i>Aucune demande en attente
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div>
+    <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary">
+        Retour au tableau de bord
+    </a>
+</div>
+
+{% endblock %}

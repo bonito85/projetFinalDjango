@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'crispy_bootstrap5',
     'cooperative',
     'accounts',
+    'authentication',
 ]
 # Crispy Forms settings
 
@@ -154,16 +155,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'bonituynathan@gmail.com'  # Exemple avec Gmail
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'bonituynathan@gmail.com'
-EMAIL_HOST_PASSWORD = 'Probook650G1'
-DEFAULT_FROM_EMAIL = 'bonituynathan@gmail.com'
-ADMIN_EMAIL = 'bonituynathan@gmail.com'
-SITE_URL = 'http://127.0.0.1:8000'
-
 # Authentification
-LOGIN_URL = '/login/'
+LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/membre/'

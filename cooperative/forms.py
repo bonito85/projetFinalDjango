@@ -73,5 +73,6 @@ class InscriptionMembreForm(forms.ModelForm):
         model = Membre
         fields = ['nom', 'prenom', 'email_adresse', 'password', 'sexe', 'date_naissance', 'adresse', 'cooperative']
         widgets = {
+            
             'date_naissance': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
         }
